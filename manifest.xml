@@ -1,6 +1,7 @@
 <package>
-  <description brief="This is the library for sick laser scanner.">
-  
+  <description brief="This is the library for sick laser scanner."> 
+  Orginal sources from http://sicktoolbox.sourceforge.net/, adapted for rock.
+
   </description>
   <author>Malgorzata Goldhoorn/</author>
   <license></license>
