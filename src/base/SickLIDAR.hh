@@ -61,6 +61,8 @@ namespace SickToolbox {
     
     /** A virtual destructor */
     virtual ~SickLIDAR( );
+    
+    int getReadFD() { return _sick_fd; }
 
   protected:
 
