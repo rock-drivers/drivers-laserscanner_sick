@@ -1,6 +1,7 @@
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
-
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base
+		    ${CMAKE_CURRENT_SOURCE_DIR}
+		    )
 
 rock_library(laserscanner_sick
     SOURCES ld/SickLDBufferMonitor.cc 
@@ -30,6 +31,8 @@ rock_library(laserscanner_sick
             lms2xx/SickLMS2xx.hh
             lms2xx/SickLMS2xxMessage.hh)
 
+rock_executable(laserscanner_sick_app lms1xx/main.cc
+		DEPS laserscanner_sick)
 
 target_link_libraries(laserscanner_sick pthread)
 
