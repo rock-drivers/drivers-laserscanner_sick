@@ -83,16 +83,17 @@ int main(int argc, char* argv[])
 
     vector<double> ranges, remission;
     int k = 0;
-    while(k<10000){
+    while(1){
+	k++;
 	try{
 	    sick->GetSickMeasurements(range_1_vals,range_2_vals,reflect_1_vals,reflect_2_vals,num_measurements,&status);
 	    for(int i=0; i<num_measurements; i++){
-		ranges.push_back(range_1_vals[i]);
-		std::cout << range_1_vals[i] << std::endl;
+		//ranges.push_back(range_1_vals[i]);
+		//std::cout << range_1_vals[i] << std::endl;
 	    }
 	    for(int i=0; i<num_measurements; i++){
-		remission.push_back(reflect_1_vals[i]);
-		std::cout << reflect_1_vals[i] << std::endl;
+		//remission.push_back(reflect_1_vals[i]);
+		//std::cout << reflect_1_vals[i] << std::endl;
 	    }
 	}
 	catch(SickToolbox::SickIOException sick_exception) {

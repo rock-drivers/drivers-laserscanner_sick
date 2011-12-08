@@ -20,6 +20,7 @@
 #include <iostream>
 #include <pthread.h>
 #include "SickException.hh"
+#include <iodrivers_base/Driver.hpp>
 
 /* Associate the namespace */
 namespace SickToolbox {
@@ -28,7 +29,7 @@ namespace SickToolbox {
    * \class SickBufferMonitor
    */
   template < class SICK_MONITOR_CLASS, class SICK_MSG_CLASS >
-  class SickBufferMonitor {
+  class SickBufferMonitor : public iodrivers_base::Driver {
 
   public:
 
@@ -58,6 +59,8 @@ namespace SickToolbox {
 
     /** A standard destructor */
     ~SickBufferMonitor( ) throw( SickThreadException );
+
+    virtual int extractPacket(uint8_t const* buffer, size_t buffer_size) const = 0;
 
   protected:
 
@@ -104,7 +107,9 @@ namespace SickToolbox {
    */
   template < class SICK_MONITOR_CLASS, class SICK_MSG_CLASS >
   SickBufferMonitor< SICK_MONITOR_CLASS, SICK_MSG_CLASS >::SickBufferMonitor( SICK_MONITOR_CLASS * const monitor_instance ) throw( SickThreadException ) :
-    _sick_monitor_instance(monitor_instance), _continue_grabbing(true), _monitor_thread_id(0) {
+    _sick_monitor_instance(monitor_instance), _continue_grabbing(true), _monitor_thread_id(0),iodrivers_base::Driver(SICK_MSG_CLASS::MESSAGE_PAYLOAD_MAX_LENGTH,false)
+
+    {
     
     /* Initialize the shared message buffer mutex */
     if (pthread_mutex_init(&_container_mutex,NULL) != 0) {
@@ -286,7 +291,6 @@ namespace SickToolbox {
    */
   template < class SICK_MONITOR_CLASS, class SICK_MSG_CLASS >
   SickBufferMonitor< SICK_MONITOR_CLASS, SICK_MSG_CLASS >::~SickBufferMonitor( ) throw( SickThreadException ) {
-
     /* Destroy the message container mutex */
     if (pthread_mutex_destroy(&_container_mutex) != 0) {
       throw SickThreadException("SickBufferMonitor::~SickBufferMonitor: pthread_mutex_destroy() failed!");

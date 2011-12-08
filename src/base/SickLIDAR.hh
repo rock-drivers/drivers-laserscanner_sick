@@ -258,6 +258,7 @@ namespace SickToolbox {
   template< class SICK_MONITOR_CLASS, class SICK_MSG_CLASS >
   void SickLIDAR< SICK_MONITOR_CLASS, SICK_MSG_CLASS >::_sendMessage( const SICK_MSG_CLASS &sick_message, const unsigned int byte_interval ) const
     throw( SickIOException ) {
+    
 
     uint8_t message_buffer[SICK_MSG_CLASS::MESSAGE_MAX_LENGTH] = {0};
 
@@ -265,6 +266,15 @@ namespace SickToolbox {
     sick_message.GetMessage(message_buffer);
     unsigned int message_length = sick_message.GetMessageLength();
 
+    _sick_buffer_monitor->writePacket(message_buffer,message_length);
+    
+    //for(int i=0;i<message_length;i++){
+//	_sick_buffer_monitor->writePacket(message_buffer+i,1);
+	
+	/* Some time between bytes (Sick LMS 2xx likes this) */
+//	usleep(byte_interval);	
+ //   }
+    #if 0
     /* Check whether a transmission delay between bytes is requested */
     if (byte_interval == 0) {
       
@@ -288,7 +298,8 @@ namespace SickToolbox {
 	usleep(byte_interval);	
       }
 
-    }    
+    }
+    #endif
 
   }
 
@@ -302,15 +313,15 @@ namespace SickToolbox {
   void SickLIDAR< SICK_MONITOR_CLASS, SICK_MSG_CLASS >::_recvMessage( SICK_MSG_CLASS &sick_message,
 								      const unsigned int timeout_value ) const throw ( SickTimeoutException ) {
 
+   
     /* Timeval structs for handling timeouts */
     struct timeval beg_time, end_time;
 
     /* Acquire the elapsed time since epoch */
     gettimeofday(&beg_time,NULL);
-    
+   
     /* Check the shared object */
     while(!_sick_buffer_monitor->GetNextMessageFromMonitor(sick_message)) {    
-      
       /* Sleep a little bit */
       usleep(1000);
     
@@ -364,11 +375,14 @@ namespace SickToolbox {
 	
 	/* Match the byte sequence */
 	for (i=0; (i < byte_sequence_length) && (payload_buffer[i] == byte_sequence[i]); i++);
+    
 
 	/* Our message was found! */
 	if (i == byte_sequence_length) {
 	  sick_message = curr_message;
 	  break;
+	}else{
+	    //std::cout << "i: " << i << " byte sequence length: " <<	    byte_sequence_length << std::endl;
 	}
 	
       }
@@ -407,9 +421,9 @@ namespace SickToolbox {
     for(unsigned int i = 0; i < num_tries; i++) {
 
       try {
-
 	/* Send the frame to the unit */
 	_sendMessage(send_message,byte_interval);
+	
 	
 	/* Wait for the reply! */
 	_recvMessage(recv_message,byte_sequence,byte_sequence_length,timeout_value);

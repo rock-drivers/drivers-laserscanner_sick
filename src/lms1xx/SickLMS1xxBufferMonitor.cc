@@ -32,7 +32,9 @@ namespace SickToolbox {
   /**
    * \brief A standard constructor
    */
-  SickLMS1xxBufferMonitor::SickLMS1xxBufferMonitor( ) : SickBufferMonitor< SickLMS1xxBufferMonitor, SickLMS1xxMessage >(this) { }
+  SickLMS1xxBufferMonitor::SickLMS1xxBufferMonitor( ) : SickBufferMonitor< SickLMS1xxBufferMonitor, SickLMS1xxMessage >(this) { 
+	//setFileDescriptor(_sick_fd,false);
+  }
 
   /**
    * \brief Acquires the next message from the SickLMS1xx byte stream
@@ -43,7 +45,9 @@ namespace SickToolbox {
     /* Flush the input buffer */
     uint8_t byte_buffer = 0;
     uint8_t payload_buffer[SickLMS1xxMessage::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
-    
+    int payload_length = 0;
+
+#if 0    
     try {
 
       /* Flush the TCP receive buffer */
@@ -59,7 +63,6 @@ namespace SickToolbox {
       while (byte_buffer != 0x02);
       
       /* Ok, now acquire the payload! (until ETX) */
-      int payload_length = 0;
       do {
 	
 	payload_length++;
@@ -68,22 +71,31 @@ namespace SickToolbox {
       }
       while (payload_buffer[payload_length-1] != 0x03);
       payload_length--;
-      
+#endif
+	try{  
+	payload_length = readPacket(payload_buffer,SickLMS1xxMessage::MESSAGE_PAYLOAD_MAX_LENGTH,1000,1000);
+	
+ 
       /* Build the return message object based upon the received payload
        * NOTE: In constructing this message we ignore the header bytes
        *       buffered since the BuildMessage routine will insert the
        *       correct header automatically and verify the message size
        */
-      sick_message.BuildMessage(payload_buffer,payload_length);
+      sick_message.BuildMessage(payload_buffer+1,payload_length-1);
 
       /* Success */
       
     }
     
-    catch(SickTimeoutException &sick_timeout) { /* This is ok! */ }
-    
+    //catch(SickTimeoutException &sick_timeout) { /* This is ok! */ }
+    catch(iodrivers_base::TimeoutError &sick_timeout) { /* This is ok! */ }
+
     /* Catch any serious IO buffer exceptions */
     catch(SickIOException &sick_io_exception) {
+      throw;
+    }
+    catch(iodrivers_base::UnixError &e) {
+      std::cout << e.what();
       throw;
     }
     
@@ -97,7 +109,12 @@ namespace SickToolbox {
   /**
    * \brief Flushes TCP receive buffer contents
    */
-  void SickLMS1xxBufferMonitor::_flushTCPRecvBuffer( ) const throw (SickIOException) {
+  void SickLMS1xxBufferMonitor::_flushTCPRecvBuffer( ) throw (SickIOException) {
+   	
+	//Simply calling clear in iodriver ald let the iodriver do the rest
+	clear();
+
+	#if 0 
     
     char null_byte;
     int num_bytes_waiting = 0;    
@@ -106,7 +123,6 @@ namespace SickToolbox {
     if (ioctl(_sick_fd,FIONREAD,&num_bytes_waiting)) {
       throw SickIOException("SickLMS1xxBufferMonitor::_flushTCPRecvBuffer: ioctl() failed!");
     }
-    
     /* Flush awaiting bytes */
     for (int i = 0; i < num_bytes_waiting; i++) {
       
@@ -116,6 +132,7 @@ namespace SickToolbox {
       }	  
       
     }
+#endif
     
   }
   
@@ -123,5 +140,31 @@ namespace SickToolbox {
    * \brief A standard destructor
    */
   SickLMS1xxBufferMonitor::~SickLMS1xxBufferMonitor( ) { }
-    
+  
+  int SickLMS1xxBufferMonitor::extractPacket(uint8_t const* buffer, size_t buffer_size) const{
+	int readPos = 0;
+
+	//Searching for 0x02 for package start
+	while(buffer[readPos] != 0x02 && readPos < buffer_size){
+		readPos++;
+	}
+
+	//If package start was not 0, returning offset to get calles again
+	if(readPos > 0){
+		return -readPos;
+	}
+	
+	//Package start found so search for end of packet
+	while(buffer[readPos] != 0x03 && readPos < buffer_size){
+		readPos ++;
+	}
+
+	if(readPos == buffer_size){ //End of stream not found start, so packed is not complete yet
+		return 0;
+	}
+
+	//Found package end, so give package len
+	return readPos;
+  }
+  
 } /* namespace SickToolbox */

@@ -44,10 +44,12 @@ namespace SickToolbox {
     /** A standard destructor */
     ~SickLMS1xxBufferMonitor( );
 
+    virtual int extractPacket(uint8_t const* buffer, size_t buffer_size) const;
+
   private:
 
     /* A utility function for flushing the receive buffer */
-    void _flushTCPRecvBuffer( ) const throw ( SickIOException );
+    void _flushTCPRecvBuffer( ) throw ( SickIOException );
     
   };
     
