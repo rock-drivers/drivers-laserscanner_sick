@@ -100,11 +100,11 @@ namespace SickToolbox {
       if (disp_banner) {
 	std::cout << "\tSyncing driver with Sick..." << std::endl;
       }
-      std::cout << "Getting sick scan config" << std::endl;
+
       _getSickScanConfig();
-      std::cout << "\t Setting authorized mode" << std::endl;
+
       _setAuthorizedClientAccessMode();
-      std::cout << "\t sucsessfull\n" << std::endl;
+
       if (disp_banner) {
 	std::cout << "\t\tSuccess!" << std::endl;
 	_printInitFooter();  	
@@ -685,17 +685,19 @@ namespace SickToolbox {
    * \brief Establish a TCP connection to the unit
    */
   void SickLMS1xx::_setupConnection( ) throw( SickIOException, SickTimeoutException ) {
+
     if(_sick_fd > 0) throw ;
 
     try{
-	_sick_buffer_monitor->openTCP(_sick_ip_address,_sick_tcp_port);
+	_sick_buffer_monitor->openTCP(_sick_ip_address, _sick_tcp_port);
     }catch(iodrivers_base::UnixError e){
 	std::cerr << "Unix error: " << e.what() << std::endl;
     }catch(...){
 	throw SickIOException("SickLMS1xx::_setupConnection:socket() failed!");
     }
     _sick_fd = _sick_buffer_monitor->getFileDescriptor();
-    std::cout << "Setup connection called\n";
+    //std::cout << "Setup connection called\n";
+
     #if 0
     /* Create the TCP socket */
     if ((_sick_fd = socket(PF_INET,SOCK_STREAM,IPPROTO_TCP)) < 0) {
@@ -857,6 +859,7 @@ namespace SickToolbox {
     
     _sick_buffer_monitor->close();
     _sick_fd = 0;
+
     #if 0
      /* Close the socket! */
      if (close(_sick_fd) < 0) {
@@ -2135,6 +2138,7 @@ namespace SickToolbox {
    *  \param sick_message Reference to container to hold received message
    */
   void SickLMS1xx::_recvMessage( SickLMS1xxMessage &sick_message ) const throw ( SickTimeoutException ) {
+
     try {
     
       /* Receive message using parent's method */

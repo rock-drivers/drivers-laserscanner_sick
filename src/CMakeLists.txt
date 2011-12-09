@@ -30,7 +30,7 @@ rock_library(laserscanner_sick
             #lms2xx/SickLMS2xxBufferMonitor.hh
             #lms2xx/SickLMS2xx.hh
             #lms2xx/SickLMS2xxMessage.hh
-	DEPS_PKGCONFIG iodrivers_base)
+    DEPS_PKGCONFIG iodrivers_base)
 
 rock_executable(laserscanner_sick_app lms1xx/main.cc
 		DEPS laserscanner_sick)

@@ -32,9 +32,7 @@ namespace SickToolbox {
   /**
    * \brief A standard constructor
    */
-  SickLMS1xxBufferMonitor::SickLMS1xxBufferMonitor( ) : SickBufferMonitor< SickLMS1xxBufferMonitor, SickLMS1xxMessage >(this) { 
-	//setFileDescriptor(_sick_fd,false);
-  }
+  SickLMS1xxBufferMonitor::SickLMS1xxBufferMonitor( ) : SickBufferMonitor< SickLMS1xxBufferMonitor, SickLMS1xxMessage >(this) { }
 
   /**
    * \brief Acquires the next message from the SickLMS1xx byte stream
@@ -45,6 +43,7 @@ namespace SickToolbox {
     /* Flush the input buffer */
     uint8_t byte_buffer = 0;
     uint8_t payload_buffer[SickLMS1xxMessage::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
+
     int payload_length = 0;
 
 #if 0    
@@ -72,8 +71,8 @@ namespace SickToolbox {
       while (payload_buffer[payload_length-1] != 0x03);
       payload_length--;
 #endif
-	try{  
-	payload_length = readPacket(payload_buffer,SickLMS1xxMessage::MESSAGE_PAYLOAD_MAX_LENGTH,1000,1000);
+    try{  
+	payload_length = readPacket(payload_buffer, SickLMS1xxMessage::MESSAGE_PAYLOAD_MAX_LENGTH, 1000, 1000);
 	
  
       /* Build the return message object based upon the received payload
@@ -81,13 +80,12 @@ namespace SickToolbox {
        *       buffered since the BuildMessage routine will insert the
        *       correct header automatically and verify the message size
        */
-      sick_message.BuildMessage(payload_buffer+1,payload_length-1);
+      sick_message.BuildMessage(payload_buffer+1, payload_length-1);
 
       /* Success */
       
     }
     
-    //catch(SickTimeoutException &sick_timeout) { /* This is ok! */ }
     catch(iodrivers_base::TimeoutError &sick_timeout) { /* This is ok! */ }
 
     /* Catch any serious IO buffer exceptions */
@@ -114,8 +112,7 @@ namespace SickToolbox {
 	//Simply calling clear in iodriver ald let the iodriver do the rest
 	clear();
 
-	#if 0 
-    
+#if 0     
     char null_byte;
     int num_bytes_waiting = 0;    
 

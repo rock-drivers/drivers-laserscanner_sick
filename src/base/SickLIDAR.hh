@@ -259,22 +259,22 @@ namespace SickToolbox {
   void SickLIDAR< SICK_MONITOR_CLASS, SICK_MSG_CLASS >::_sendMessage( const SICK_MSG_CLASS &sick_message, const unsigned int byte_interval ) const
     throw( SickIOException ) {
     
-
     uint8_t message_buffer[SICK_MSG_CLASS::MESSAGE_MAX_LENGTH] = {0};
 
     /* Copy the given message and get the message length */
     sick_message.GetMessage(message_buffer);
     unsigned int message_length = sick_message.GetMessageLength();
 
-    _sick_buffer_monitor->writePacket(message_buffer,message_length);
+    _sick_buffer_monitor->writePacket(message_buffer, message_length);
     
-    //for(int i=0;i<message_length;i++){
-//	_sick_buffer_monitor->writePacket(message_buffer+i,1);
+  #if 0
+    for(int i=0;i<message_length;i++){
+	_sick_buffer_monitor->writePacket(message_buffer+i,1);
 	
 	/* Some time between bytes (Sick LMS 2xx likes this) */
-//	usleep(byte_interval);	
- //   }
-    #if 0
+	usleep(byte_interval);	
+   }
+    
     /* Check whether a transmission delay between bytes is requested */
     if (byte_interval == 0) {
       
@@ -299,7 +299,7 @@ namespace SickToolbox {
       }
 
     }
-    #endif
+  #endif
 
   }
 
@@ -382,7 +382,7 @@ namespace SickToolbox {
 	  sick_message = curr_message;
 	  break;
 	}else{
-	    //std::cout << "i: " << i << " byte sequence length: " <<	    byte_sequence_length << std::endl;
+	    //std::cout << "i: " << i << " byte sequence length: " << byte_sequence_length << std::endl;
 	}
 	
       }

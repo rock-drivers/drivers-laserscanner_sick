@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
 
     vector<double> ranges, remission;
     int k = 0;
-    while(1){
+    while(1000){
 	k++;
 	try{
 	    sick->GetSickMeasurements(range_1_vals,range_2_vals,reflect_1_vals,reflect_2_vals,num_measurements,&status);
