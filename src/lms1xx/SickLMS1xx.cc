@@ -698,107 +698,6 @@ namespace SickToolbox {
     _sick_fd = _sick_buffer_monitor->getFileDescriptor();
     //std::cout << "Setup connection called\n";
 
-    #if 0
-    /* Create the TCP socket */
-    if ((_sick_fd = socket(PF_INET,SOCK_STREAM,IPPROTO_TCP)) < 0) {
-      throw SickIOException("SickLMS1xx::_setupConnection: socket() failed!");
-    }
-    
-    /* Initialize the buffer */
-    memset(&_sick_inet_address_info,0,sizeof(struct sockaddr_in));
-  
-    /* Setup the Sick LD inet address structure */
-    _sick_inet_address_info.sin_family = AF_INET;                                  // Internet protocol address family
-    _sick_inet_address_info.sin_port = htons(_sick_tcp_port);                      // TCP port number
-    _sick_inet_address_info.sin_addr.s_addr = inet_addr(_sick_ip_address.c_str()); // Convert ip string to numerical address
-
-    try {
-
-      /* Set to non-blocking so we can time connect */
-      _setNonBlockingIO();
-    
-      /* Try to connect to the Sick LD */
-      int conn_return;
-      if ((conn_return = connect(_sick_fd,(struct sockaddr *)&_sick_inet_address_info,sizeof(struct sockaddr_in))) < 0) {
-
-	/* Check whether it is b/c it would block */
-	if (errno != EINPROGRESS) {	
-	  throw SickIOException("SickLMS1xx::_setupConnection: connect() failed!");
-	}
-
-	/* Use select to wait on the socket */
-	int valid_opt = 0;
-	int num_active_files = 0;
-	struct timeval timeout_val;                                  // This structure will be used for setting our timeout values
-	fd_set file_desc_set;                                        // File descriptor set for monitoring I/O
-    
-	/* Initialize and set the file descriptor set for select */
-	FD_ZERO(&file_desc_set);
-	FD_SET(_sick_fd,&file_desc_set);
-
-	/* Setup the timeout structure */
-	memset(&timeout_val,0,sizeof(timeout_val));                  // Initialize the buffer
-	timeout_val.tv_usec = DEFAULT_SICK_LMS_1XX_CONNECT_TIMEOUT;  // Wait for specified time before throwing a timeout
-      
-	/* Wait for the OS to tell us that the connection is established! */
-	num_active_files = select(getdtablesize(),0,&file_desc_set,0,&timeout_val);
-      
-	/* Figure out what to do based on the output of select */
-	if (num_active_files > 0) {
-	
-	  /* This is just a sanity check */
-	  if (!FD_ISSET(_sick_fd,&file_desc_set)) {
-  	    throw SickIOException("SickLMS1xx::_setupConnection: Unexpected file descriptor!");
-	  }	  
-
-	  /* Check for any errors on the socket - just to be sure */
-	  socklen_t len = sizeof(int);
-	  if (getsockopt(_sick_fd,SOL_SOCKET,SO_ERROR,(void*)(&valid_opt),&len) < 0) { 	    
-  	    throw SickIOException("SickLMS1xx::_setupConnection: getsockopt() failed!");
-	  } 
-
-	  /* Check whether the opt value indicates error */
-	  if (valid_opt) { 
-	    throw SickIOException("SickLMS1xx::_setupConnection: socket error on connect()!");
-	  }
-	  
-  	}
-	else if (num_active_files == 0) {
-	
-	  /* A timeout has occurred! */
-	  throw SickTimeoutException("SickLMS1xx::_setupConnection: select() timeout!");
-
-	}
-	else {
-	
-	  /* An error has occurred! */
-	  throw SickIOException("SickLMS1xx::_setupConnection: select() failed!");	
-
-	}
-
-      }
-
-      /* Restore blocking IO */
-      _setBlockingIO();	
-	
-    }
-
-    catch(SickIOException &sick_io_exception) {
-      std::cerr << sick_io_exception.what() << std::endl;
-      throw;
-    }
-
-    catch(SickTimeoutException &sick_timeout_exception) {
-      std::cerr << sick_timeout_exception.what() << std::endl;
-      throw;
-    }
-    
-    catch(...) {
-      std::cerr << "SickLMS1xx::_setupConnection - Unknown exception occurred!" << std::endl;
-      throw;
-    }
-
-   #endif
     /* Success */
   }
 
@@ -859,14 +758,6 @@ namespace SickToolbox {
     
     _sick_buffer_monitor->close();
     _sick_fd = 0;
-
-    #if 0
-     /* Close the socket! */
-     if (close(_sick_fd) < 0) {
-       throw SickIOException("SickLMS1xx::_teardownConnection: close() failed!");
-     }
-     #endif
-     
      
    }
   

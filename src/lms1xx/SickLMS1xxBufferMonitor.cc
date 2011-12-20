@@ -46,31 +46,6 @@ namespace SickToolbox {
 
     int payload_length = 0;
 
-#if 0    
-    try {
-
-      /* Flush the TCP receive buffer */
-      _flushTCPRecvBuffer();
-
-      /* Search for STX in the byte stream */
-      do {
-	
- 	/* Grab the next byte from the stream */
- 	_readBytes(&byte_buffer,1,DEFAULT_SICK_LMS_1XX_BYTE_TIMEOUT);
-	
-      }
-      while (byte_buffer != 0x02);
-      
-      /* Ok, now acquire the payload! (until ETX) */
-      do {
-	
-	payload_length++;
- 	_readBytes(&payload_buffer[payload_length-1],1,DEFAULT_SICK_LMS_1XX_BYTE_TIMEOUT);
-	
-      }
-      while (payload_buffer[payload_length-1] != 0x03);
-      payload_length--;
-#endif
     try{  
 	payload_length = readPacket(payload_buffer, SickLMS1xxMessage::MESSAGE_PAYLOAD_MAX_LENGTH, 1000, 1000);
 	
@@ -111,26 +86,6 @@ namespace SickToolbox {
    	
 	//Simply calling clear in iodriver ald let the iodriver do the rest
 	clear();
-
-#if 0     
-    char null_byte;
-    int num_bytes_waiting = 0;    
-
-    /* Acquire number of awaiting bytes */
-    if (ioctl(_sick_fd,FIONREAD,&num_bytes_waiting)) {
-      throw SickIOException("SickLMS1xxBufferMonitor::_flushTCPRecvBuffer: ioctl() failed!");
-    }
-    /* Flush awaiting bytes */
-    for (int i = 0; i < num_bytes_waiting; i++) {
-      
-      /* Capture a single byte from the stream! */
-      if (read(_sick_fd,&null_byte,1) != 1) {
-	throw SickIOException("SickLMS1xxBufferMonitor::_flushTCPRecvBuffer: ioctl() failed!");
-      }	  
-      
-    }
-#endif
-    
   }
   
   /**

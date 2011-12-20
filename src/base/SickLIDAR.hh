@@ -267,40 +267,6 @@ namespace SickToolbox {
 
     _sick_buffer_monitor->writePacket(message_buffer, message_length);
     
-  #if 0
-    for(int i=0;i<message_length;i++){
-	_sick_buffer_monitor->writePacket(message_buffer+i,1);
-	
-	/* Some time between bytes (Sick LMS 2xx likes this) */
-	usleep(byte_interval);	
-   }
-    
-    /* Check whether a transmission delay between bytes is requested */
-    if (byte_interval == 0) {
-      
-      /* Write the message to the stream */
-      if ((unsigned int)write(_sick_fd,message_buffer,message_length) != message_length) {      
-	throw SickIOException("SickLIDAR::_sendMessage: write() failed!");
-      }
-
-    }
-    else {
-      
-      /* Write the message to the unit one byte at a time */
-      for (unsigned int i = 0; i < message_length; i++) {
-	
-	/* Write a single byte to the stream */
-	if (write(_sick_fd,&message_buffer[i],1) != 1) {
-	  throw SickIOException("SickLIDAR::_sendMessage: write() failed!");
-	}
-	
-	/* Some time between bytes (Sick LMS 2xx likes this) */
-	usleep(byte_interval);	
-      }
-
-    }
-  #endif
-
   }
 
   /**

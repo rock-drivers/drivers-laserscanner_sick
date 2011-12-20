@@ -1,7 +1,10 @@
 <package>
   <description brief="This is the library for sick laser scanner."> 
-  Orginal sources from http://sicktoolbox.sourceforge.net/, adapted for rock.
-
+  Original sources from http://sicktoolbox.sourceforge.net/, adapted for rock.
+  This library implements the driver for several sick laser scanners.
+  Until now only the lms1xx is supported, but support for the ld series and the lms2xx could be easily added.
+  For these scanners only the extract_package function is needed (see sourcode). This is not done yet because 
+  no laser scanner of this series for evaluation was available.
   </description>
   <author>Malgorzata Goldhoorn/</author>
   <license></license>
