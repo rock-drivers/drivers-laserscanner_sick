@@ -40,7 +40,7 @@
 #include <arpa/inet.h>
 #include <sys/time.h>
 #include "SickException.hh"
-
+#include <unistd.h>
 /* Associate the namespace */
 namespace SickToolbox {
 
