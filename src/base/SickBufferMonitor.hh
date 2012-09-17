@@ -52,7 +52,7 @@ namespace SickToolbox {
     void AcquireDataStream( ) throw( SickThreadException );
 
     /** Acquire the next message from raw byte stream */
-    void GetNextMessageFromDataStream( SICK_MSG_CLASS &sick_message );
+    virtual void GetNextMessageFromDataStream( SICK_MSG_CLASS &sick_message ) = 0;
     
     /** Unlock access to the data stream */
     void ReleaseDataStream( ) throw( SickThreadException );
@@ -164,10 +164,6 @@ namespace SickToolbox {
     /* Assign the fd associated with the data stream */
     _sick_fd = sick_fd;
     
-    /* Start the buffer monitor */
-    if (pthread_create(&_monitor_thread_id,NULL,SickBufferMonitor< SICK_MONITOR_CLASS, SICK_MSG_CLASS >::_bufferMonitorThread,_sick_monitor_instance) != 0) {
-      throw SickThreadException("SickBufferMonitor::StartMonitor: pthread_create() failed!");
-    }
 
     /* Set the flag to continue grabbing data */
     _continue_grabbing = true;
@@ -186,23 +182,8 @@ namespace SickToolbox {
 
     try {
     
-      /* Acquire a lock on the message buffer */
-      _acquireMessageContainer();
-
-      /* Check whether the object is populated */
-      if (_recv_msg_container.IsPopulated()) {
-
-	/* Copy the shared message */
-	sick_message = _recv_msg_container;
-	_recv_msg_container.Clear();
-	
-	/* Set the flag indicating success */
-	acquired_message = true;      
-      }
-
-      /* Release message container */
-      _releaseMessageContainer();      
-
+      GetNextMessageFromDataStream(sick_message);
+	return true;
     }
 
     /* Handle a thread exception */
@@ -237,11 +218,6 @@ namespace SickToolbox {
       AcquireDataStream();      
       _continue_grabbing = false;
       ReleaseDataStream();
-
-      /* Wait for the buffer monitor to exit */
-      if (pthread_join(_monitor_thread_id,&monitor_result) != 0) {
-      	throw SickThreadException("SickBufferMonitor::StopMonitor: pthread_join() failed!");      
-      }
 
     }
 
@@ -432,7 +408,6 @@ namespace SickToolbox {
 	  break;
 	}
 
-	buffer_monitor->GetNextMessageFromDataStream(curr_message);
 	buffer_monitor->ReleaseDataStream();
 	
 	/* Update message container contents */

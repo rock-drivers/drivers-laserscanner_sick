@@ -41,6 +41,7 @@
 #include <sys/time.h>
 #include "SickException.hh"
 #include <unistd.h>
+#include <iodrivers_base/Status.hpp>
 /* Associate the namespace */
 namespace SickToolbox {
 
@@ -63,6 +64,8 @@ namespace SickToolbox {
     virtual ~SickLIDAR( );
     
     int getReadFD() { return _sick_fd; }
+
+    iodrivers_base::Status getBufferMonitorStatus() const;
 
   protected:
 
@@ -267,6 +270,12 @@ namespace SickToolbox {
 
     _sick_buffer_monitor->writePacket(message_buffer, message_length);
     
+  }
+
+  template< class SICK_MONITOR_CLASS, class SICK_MSG_CLASS >
+  iodrivers_base::Status SickLIDAR< SICK_MONITOR_CLASS, SICK_MSG_CLASS >::getBufferMonitorStatus() const
+  {
+     return _sick_buffer_monitor->getStatus();
   }
 
   /**
