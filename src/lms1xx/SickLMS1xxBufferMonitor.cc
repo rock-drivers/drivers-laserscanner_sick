@@ -41,7 +41,6 @@ namespace SickToolbox {
   void SickLMS1xxBufferMonitor::GetNextMessageFromDataStream( SickLMS1xxMessage &sick_message ) throw( SickIOException ) {
 
     /* Flush the input buffer */
-    uint8_t byte_buffer = 0;
     uint8_t payload_buffer[SickLMS1xxMessage::MESSAGE_PAYLOAD_MAX_LENGTH] = {0};
 
     int payload_length = 0;
@@ -94,7 +93,7 @@ namespace SickToolbox {
   SickLMS1xxBufferMonitor::~SickLMS1xxBufferMonitor( ) { }
   
   int SickLMS1xxBufferMonitor::extractPacket(uint8_t const* buffer, size_t buffer_size) const{
-	int readPos = 0;
+	unsigned int readPos = 0;
 
 	//Searching for 0x02 for package start
 	while(buffer[readPos] != 0x02 && readPos < buffer_size){

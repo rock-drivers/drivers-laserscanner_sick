@@ -106,8 +106,12 @@ namespace SickToolbox {
    * \param device_instance A pointer to the current driver instance
    */
   template < class SICK_MONITOR_CLASS, class SICK_MSG_CLASS >
-  SickBufferMonitor< SICK_MONITOR_CLASS, SICK_MSG_CLASS >::SickBufferMonitor( SICK_MONITOR_CLASS * const monitor_instance ) throw( SickThreadException ) :
-    _sick_monitor_instance(monitor_instance), _continue_grabbing(true), _monitor_thread_id(0), iodrivers_base::Driver(SICK_MSG_CLASS::MESSAGE_PAYLOAD_MAX_LENGTH, false) {
+  SickBufferMonitor< SICK_MONITOR_CLASS, SICK_MSG_CLASS >::SickBufferMonitor( SICK_MONITOR_CLASS * const monitor_instance ) throw( SickThreadException )
+    : iodrivers_base::Driver(SICK_MSG_CLASS::MESSAGE_PAYLOAD_MAX_LENGTH, false) 
+    , _sick_monitor_instance(monitor_instance)
+    , _continue_grabbing(true)
+    , _monitor_thread_id(0)
+  {
     
     /* Initialize the shared message buffer mutex */
     if (pthread_mutex_init(&_container_mutex,NULL) != 0) {
