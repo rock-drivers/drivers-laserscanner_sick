@@ -91,7 +91,7 @@ namespace SickToolbox {
   /**
    * \brief A standard destructor
    */
-  SickLMS1xxBufferMonitor::~SickLMS1xxBufferMonitor( ) { }
+  SickLMS1xxBufferMonitor::~SickLMS1xxBufferMonitor( ) throw (SickThreadException){ }
   
   int SickLMS1xxBufferMonitor::extractPacket(uint8_t const* buffer, size_t buffer_size) const{
 	int readPos = 0;
