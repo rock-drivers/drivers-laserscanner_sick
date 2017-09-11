@@ -42,7 +42,7 @@ namespace SickToolbox {
     void GetNextMessageFromDataStream( SickLMS1xxMessage &sick_message ) throw( SickIOException );
 
     /** A standard destructor */
-    ~SickLMS1xxBufferMonitor( ) throw( SickThreadException ) ;
+    ~SickLMS1xxBufferMonitor( );
 
     virtual int extractPacket(uint8_t const* buffer, size_t buffer_size) const;
 
