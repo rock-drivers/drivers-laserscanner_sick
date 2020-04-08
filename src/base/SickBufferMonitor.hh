@@ -58,7 +58,7 @@ namespace SickToolbox {
     void ReleaseDataStream( ) throw( SickThreadException );
 
     /** A standard destructor */
-    ~SickBufferMonitor( ) throw( SickThreadException );
+    ~SickBufferMonitor( );
 
     virtual int extractPacket(uint8_t const* buffer, size_t buffer_size) const = 0;
 
@@ -268,7 +268,7 @@ namespace SickToolbox {
    * \brief The destructor (kills the mutex)
    */
   template < class SICK_MONITOR_CLASS, class SICK_MSG_CLASS >
-  SickBufferMonitor< SICK_MONITOR_CLASS, SICK_MSG_CLASS >::~SickBufferMonitor( ) throw( SickThreadException ) {
+  SickBufferMonitor< SICK_MONITOR_CLASS, SICK_MSG_CLASS >::~SickBufferMonitor( ) {
     /* Destroy the message container mutex */
     if (pthread_mutex_destroy(&_container_mutex) != 0) {
       throw SickThreadException("SickBufferMonitor::~SickBufferMonitor: pthread_mutex_destroy() failed!");
